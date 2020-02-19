@@ -20,7 +20,7 @@ class Apriori:
       global_itemset = self.database.get_distinct_attr_values()
     candidate_itemset = []
     for item in global_itemset:
-      candidate_itemset.append(Factory.create_itemset(item))
+      candidate_itemset.append(ItemSet.create_itemset(item))
     current_length = 1
     while True:
       # pruning
@@ -50,7 +50,8 @@ class Apriori:
 
   def generate_confident_rules(self, global_itemset = None):
     if global_itemset is None:
-      global_itemset = self.database.get_distinct_attr_values()
+      global_attr = self.database.get_distinct_attr_values()
+      global_itemset = ItemSet.create_itemset(*global_attr) 
     whole_support = global_itemset.support
     candidate_itemsets = []
     for item in global_itemset.items:
@@ -59,8 +60,11 @@ class Apriori:
     while True:
       confident_itemsets = [
           itemset for itemset in candidate_itemsets
-          if whole_support / itemset.support  >= self.min_confidence]
+          if (itemset.size() > 0) and 
+          (whole_support / itemset.support  >= self.min_confidence)]
       confident_rules = confident_rules + confident_itemsets
+      if len(confident_itemsets) == 0:
+        break
       candidate_itemsets.clear()
       for itemset in confident_itemsets:
         if itemset.size() == 1:
@@ -69,13 +73,12 @@ class Apriori:
           new_itemset = itemset.new_remove(item)
           if new_itemset not in candidate_itemsets:
             candidate_itemsets.append(new_itemset)
-      if len(candidate_itemsets) == 0:
-        break
     return [self._generate_rule(global_itemset, rule) for rule in confident_rules]
 
   def generate_all_confidence_rules(self):
-    frequent_itemset = self.generate_frequent_itemset()
+    frequent_itemsets = self.generate_frequent_itemset()
     confident_rules = []
-    for itemset in frequent_itemsets:
-      confident_rules = confident_rules + self.generate_confident_rules(itemset) 
+    for level in frequent_itemsets:
+      for itemset in frequent_itemsets[level]:
+        confident_rules = confident_rules + self.generate_confident_rules(itemset) 
     return sorted(confident_rules, reverse = True)[:self.num_rules]

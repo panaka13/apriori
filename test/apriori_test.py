@@ -40,5 +40,15 @@ class AprioriTest(MyUnitTest):
     rules = apriori.generate_confident_rules(itemset)
     self.assertEqual(len(rules), 3)
 
+  def test_generate_all_rule(self):
+    db = CsvDatabase(self.path)
+    apriori = Apriori(db, 0.3, 0.3, 10)
+    confident_rules = apriori.generate_all_confidence_rules()
+    self.assertEqual(len(confident_rules), 6)
+    apriori = Apriori(db, 0.3, 0.3, 5)
+    confident_rules = apriori.generate_all_confidence_rules()
+    self.assertEqual(len(confident_rules), 5)
+
+
 if __name__ == '__main__':
   unittest.main()

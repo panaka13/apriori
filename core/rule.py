@@ -21,7 +21,7 @@ class Rule(Factory):
     return '{0} => {1}'.format(self.clause, self.result)
 
   def __lt__(self, other):
-    if not isinstance(self, ItemSet):
+    if not isinstance(self, Rule):
       raise 'Cannot compare rule with other structure'
     if self.confidence != other.confidence:
       return self.confidence < other.confidence
