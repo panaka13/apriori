@@ -14,6 +14,17 @@ class Apriori:
     self.min_confidence = min_confidence
     self.num_rules = num_rules
 
+  def _extend_itemset_by_join(self, itemsets):
+    candidate_itemsets = []
+    for i in range(len(itemsets)):
+      for j in range(i+1, len(itemsets)):
+        if itemsets[i].distance(itemsets[j]) == 1:
+          joined_itemset = itemsets[i].join(itemsets[j])
+          # TODO: check pruning
+          if joined_itemset not in candidate_itemsets:
+            candidate_itemsets.append(joined_itemset)
+    return candidate_itemsets
+
   def generate_frequent_itemset(self, global_itemset = None):
     frequent_itemsets = {}
     if global_itemset is None:
@@ -29,18 +40,13 @@ class Apriori:
           if itemset.support >= self.min_support]
       if len(frequent_itemset) == 0:
         break
+      # print('L%d: %d frequennt itemset' % (current_length, len(frequent_itemset)))
       frequent_itemsets[current_length] = frequent_itemset
       current_length += 1
       # new candidate
       # TODO: make new candidate more efficient to check/insert
       candidate_itemset.clear()
-      for i in range(len(frequent_itemset)):
-        for j in range(i+1, len(frequent_itemset)):
-          if frequent_itemset[i].distance(frequent_itemset[j]) == 1:
-            joined_itemset = frequent_itemset[i].join(frequent_itemset[j])
-            # TODO: check pruning
-            if joined_itemset not in candidate_itemset:
-              candidate_itemset.append(joined_itemset)
+      candidate_itemset = self._extend_itemset_by_join(frequent_itemset)
     return frequent_itemsets
 
   def _generate_rule(self, global_itemset: ItemSet, clause: ItemSet):

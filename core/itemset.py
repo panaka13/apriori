@@ -42,6 +42,15 @@ class ItemSet(Factory):
       if item not in args:
         new_set.append(item)
     return ItemSet.create_itemset(*new_set)
+
+  def new_add(self, *args):
+    new_set = []
+    for item in self.items:
+      new_set.append(item)
+    for item in args:
+      if item not in new_set:
+        new_set.append(item)
+    return ItemSet.create_itemset(*new_set)
   
   def size(self):
     return len(self.items)

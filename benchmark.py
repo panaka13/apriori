@@ -6,22 +6,24 @@ from core.csv_database import CsvDatabase
 from core.factory import Factory
 from core.apriori import Apriori
 
-interval = 2
-low_support = 0.01
-high_support = 1
-confidence = 0.5
+interval = 100
+low_support = 0.1
+high_support = 0.5
+confidence = 0
 
 def graph_runtime(runtimes):
   plt.plot(np.linspace(low_support, high_support, interval), runtimes, label = 'runtime over support')
   plt.xlabel('support')
-  plt.xlabel('runtime (in second)')
+  plt.ylabel('runtime (in second)')
+  plt.legend()
   plt.savefig('runtime.png')
   plt.close()
 
 def graph_numrules(numrules):
   plt.plot(np.linspace(low_support, high_support, interval), numrules, label = 'runtime over support')
   plt.xlabel('support')
-  plt.xlabel('number of rules')
+  plt.ylabel('number of rules')
+  plt.legend()
   plt.savefig('numrules.png')
   plt.close()
 
@@ -34,6 +36,8 @@ def main():
     start_time = time.monotonic()
     apriori = Apriori(db, support, confidence, None)
     rules = apriori.generate_all_confidence_rules()
+    #for rule in rules:
+    #  print(rule, ': ', rule.confidence)
     end_time = time.monotonic()
     runtimes.append(end_time - start_time)
     numrule = len(rules)
