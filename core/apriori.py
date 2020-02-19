@@ -81,4 +81,7 @@ class Apriori:
     for level in frequent_itemsets:
       for itemset in frequent_itemsets[level]:
         confident_rules = confident_rules + self.generate_confident_rules(itemset) 
-    return sorted(confident_rules, reverse = True)[:self.num_rules]
+    if self.num_rules is not None:
+      return sorted(confident_rules, reverse = True)[:self.num_rules]
+    else:
+      return sorted(confident_rules, reverse = True)
