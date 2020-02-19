@@ -1,8 +1,8 @@
 import pandas
 
-from .database import Database
-from .itemset import ItemSet
-from .attr_value import AttributeValue
+from core.database import Database
+from core.itemset import ItemSet
+from core.attr_value import AttributeValue
 
 class CsvDatabase(Database):
   def __init__(self, path):
@@ -19,6 +19,7 @@ class CsvDatabase(Database):
     return attr_values
 
   def support_count(self, itemset: ItemSet):
+    super().increase_counter()
     if itemset.isEmpty():
       return len(self.df)
     df = self.df

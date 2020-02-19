@@ -7,7 +7,9 @@ from core.csv_database import CsvDatabase
 from core.attr_value import AttributeValue
 from core.itemset import ItemSet
 
-class CsvDatabaseTest(unittest.TestCase):
+from testcase import MyUnitTest
+
+class CsvDatabaseTest(MyUnitTest):
   path = os.path.join(os.getcwd(), 'test_data/contact-lenses.csv')
 
   def _check(self, attr, value, attr_values):
@@ -17,11 +19,11 @@ class CsvDatabaseTest(unittest.TestCase):
     db = CsvDatabase(self.path)
     a1 = AttributeValue('age', 'young')
     a2 = AttributeValue('spectacle-prescrip', 'myope')
-    set1 = ItemSet(a1)
+    set1 = ItemSet.create_itemset(a1)
     self.assertEqual(db.support_count(set1), 8)
-    set2 = ItemSet(a1, a2)
+    set2 = ItemSet.create_itemset(a1, a2)
     self.assertEqual(db.support_count(set2), 4)
-    self.assertEqual(db.counter, 3)
+    self.assertEqual(db.counter, 5)
 
   def test_distinct_attr_value(self):
     db = CsvDatabase(self.path)
@@ -33,6 +35,14 @@ class CsvDatabaseTest(unittest.TestCase):
     self._check('spectacle-prescrip', 'myope', attr_values)
     self._check('spectacle-prescrip', 'hypermetrope', attr_values)
 
+  def test_confidence(self):
+    db = CsvDatabase(self.path)
+    a1 = AttributeValue('age', 'young')
+    a2 = AttributeValue('spectacle-prescrip', 'myope')
+    a3 = AttributeValue('astigmatism', 'yes')
+    set1 = ItemSet.create_itemset(a1, a2)
+    set2 = ItemSet.create_itemset(a3)
+    self.assertEqual(db.confidence(set1, set2), 2/4)
 
 if __name__ == '__main__':
   unittest.main()

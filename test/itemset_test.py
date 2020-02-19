@@ -6,17 +6,18 @@ sys.path.append(os.getcwd())
 from core.attr_value import AttributeValue
 from core.itemset import ItemSet
 
+from testcase import MyUnitTest
 
-class ItemSetTest(unittest.TestCase):
+class ItemSetTest(MyUnitTest):
   def test_diff(self):
-    a1 = AttributeValue('a', 1)
-    a2 = AttributeValue('a', 2)
-    a3 = AttributeValue('a', 3)
-    a4 = AttributeValue('a', 4)
-    set1 = ItemSet(a1, a2, a3)
-    set2 = ItemSet(a2, a3, a4)
-    set3 = ItemSet(a1, a4)
-    set4 = ItemSet()
+    a1 = AttributeValue('age', 'young')
+    a2 = AttributeValue('age', 'pre-presbyopic')
+    a3 = AttributeValue('age', 'presbyopic')
+    a4 = AttributeValue('contact-lenses', 'none')
+    set1 = ItemSet.create_itemset(a1, a2, a3)
+    set2 = ItemSet.create_itemset(a2, a3, a4)
+    set3 = ItemSet.create_itemset(a1, a4)
+    set4 = ItemSet.create_itemset()
     self.assertEqual(set1.diff(set2), 2,
         '{0} and {1} does not have correct diff'.format(set1, set2))
     self.assertEqual(set2.diff(set3), 3,
@@ -28,18 +29,25 @@ class ItemSetTest(unittest.TestCase):
 
 
   def test_join(self):
-    a1 = AttributeValue('a', 1)
-    a2 = AttributeValue('a', 2)
-    a3 = AttributeValue('a', 3)
-    a4 = AttributeValue('a', 4)
-    set1 = ItemSet(a1, a2, a3)
-    set2 = ItemSet(a1, a4)
+    a1 = AttributeValue('age', 'young')
+    a2 = AttributeValue('age', 'pre-presbyopic')
+    a3 = AttributeValue('age', 'presbyopic')
+    a4 = AttributeValue('contact-lenses', 'none')
+    set1 = ItemSet.create_itemset(a1, a2, a3)
+    set2 = ItemSet.create_itemset(a1, a4)
     set3 = set2.join(set1)
     self.assertEqual(len(set3.items), 4)
     self.assertTrue(a1 in set3.items)
     self.assertTrue(a2 in set3.items)
     self.assertTrue(a3 in set3.items)
     self.assertTrue(a4 in set3.items)
+
+  def test_equality(self):
+    a1 = AttributeValue('age', 'young')
+    a2 = AttributeValue('age', 'pre-presbyopic')
+    set1 = ItemSet.create_itemset(a1, a2)
+    set2 = ItemSet.create_itemset(a2, a1)
+    self.assertEqual(set1, set2)
 
 
 if __name__ == '__main__':

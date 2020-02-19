@@ -1,9 +1,11 @@
-from .attr_value import AttributeValue
+from core.attr_value import AttributeValue
+from core.factory import Factory
 
-class ItemSet:
-  def __init__(self, *argv):
+class ItemSet(Factory):
+  def __init__(self, items):
     self.items = []
-    for item in argv:
+    self.support = -1
+    for item in items:
       if isinstance(item, AttributeValue):
         if item not in self.items:
           self.items.append(item)
@@ -13,7 +15,7 @@ class ItemSet:
     for item in other.items:
       if item not in new_item_list:
         new_item_list.append(item)
-    return ItemSet(*new_item_list)
+    return ItemSet.create_itemset(*new_item_list)
 
   def number_not_in(self, other):
     # TODO: make this faster
@@ -33,15 +35,31 @@ class ItemSet:
 
   def isEmpty(self):
     return len(self.items) == 0
+
+  def new_remove(self, *args):
+    new_set = []
+    for item in self.items:
+      if item not in args:
+        new_set.append(item)
+    return ItemSet.create_itemset(*new_set)
+  
+  def size(self):
+    return len(self.items)
     
   def __str__(self):
     return 'itemset {{{0}}}'.format(','.join(map(str, self.items)))
 
-  def __le__(self, other):
+  def __eq__(self, other):
     if not isinstance(other, ItemSet):
       raise 'Cannot compare itemset with other structure'
-    # TODO: make this faster
-    for item in self.items:
-      if item not in other.items:
-        return False
-    return True
+    return self.diff(other) == 0
+
+  @classmethod
+  def create_itemset(cls, *args):
+    items = []
+    for item in args:
+      if item not in items:
+        items.append(item)
+    itemset = ItemSet(items)
+    itemset.support = cls.database.support(itemset)
+    return itemset
